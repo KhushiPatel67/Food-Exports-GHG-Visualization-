@@ -63,13 +63,6 @@
         const mapHeight = height - margin.top - margin.bottom;
         const map = svg.append("g");
 
-        document.getElementById("yearSlider").addEventListener("input", function () {
-            const year = this.value;
-            document.getElementById("yearDisplay").textContent = `Year: ${year}`;
-            console.log("aaa")
-            updateMap(year);  // This is not work for some reason
-        });
-
         const requestData = async function () {
             const us = await d3.json("states.json");
             const emissionsData = await d3.csv("final_data/ag_ghg.csv", d3.autoType);
@@ -82,7 +75,6 @@
             const projection = d3.geoAlbersUsa().fitSize([mapWidth, mapHeight], states);
             const path = d3.geoPath().projection(projection);
 
-            // Creating paths and assigning to `statePaths`
             const statePaths = map.selectAll("path.state").data(states.features)
                 .join("path")
                 .attr("class", "state")
@@ -104,6 +96,12 @@
                 .attr("class", "outline")
                 .attr("d", path);
 
+            // Update the map color when the slider value changes
+            document.getElementById("yearSlider").addEventListener("input", function () {
+                const year = this.value;
+                document.getElementById("yearDisplay").textContent = `Year: ${year}`;
+                updateMap(year);  // Update the map based on the selected year
+            });
 
             function getEmissionValue(state, year) {
                 const stateData = emissionsData.find(d => d.State === state && d.Year === +year);
@@ -111,16 +109,15 @@
             }
 
             function updateMap(year) {
-                console.log("1")
                 statePaths.transition()
                     .duration(200)
                     .style("fill", d => {
                         const emissionValue = getEmissionValue(d.properties.name, year);
-                        console.log("2")
                         return emissionValue ? colorScale(emissionValue) : "#ccc";  // Default grey if no data
                     });
             }
 
+            // Initial map update
             updateMap(2011);
         };
 
