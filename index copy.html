@@ -62,6 +62,33 @@
     </div>
 
     <script>
+        // Ordered on priority:
+
+        // 1) Visuals and functionality
+        // For the pie chart in pop-up, add legend that displays colors and the 
+        // numerical price of each export (update the data file to include that)
+        // Move the slider to below the map and add a color scale legend for the
+        // map itself (currently from 0 to >=38).
+
+        // 2) New deafult state (no more blank pop-up)
+        // By deafult (when no state is hovered over, it should show the 
+        // summation of the emissions from all states and a pie chart of all 
+        // total exports and their percentages). Should make another dataset for that.
+        // Be sure that this pop-up does not bug out when moving between years.
+
+        // 3) (only if we have time) New feature
+        // When you click on a state, it "locks" the pop-up in to the state you 
+        // clicked on (signified by a red outline instead of black).
+        // Clicking the state again will "unlock" it and resume deafult behavior 
+        // With this you can freely use the slider and watch the statitics in 
+        // the box change.
+
+        // Do not do this arrow key idea, this is just a feature I came up with.
+        // Add a feature where pressing the arrow keys moves the slider by a year
+        // if this is done, and your mouse is over a state, you should assume the
+        // state hover over is considered "locked" and will seemlessly change to
+        // the subsequent year when they are change this way.
+
         let svg = d3.select("#map1");
         const width = svg.attr("width");
         const height = svg.attr("height");
@@ -121,7 +148,7 @@
 
             function updateMap(year) {
                 statePaths.transition()
-                    .duration(200)
+                    .duration(100)
                     .style("fill", d => {
                         const emissionValue = getEmissionValue(d.properties.name, year);
                         return emissionValue ? colorScale(emissionValue) : "#ccc";
