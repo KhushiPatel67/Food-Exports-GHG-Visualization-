@@ -67,8 +67,13 @@
             const us = await d3.json("states.json");
             const emissionsData = await d3.csv("final_data/ag_ghg.csv", d3.autoType);
 
+            // const colorScale = d3.scaleSequential(d3.interpolateBlues)
+            //     .domain([0, d3.max(emissionsData, d => +d.Total_Ag_Emissions_In_MilsMecTon)]);
+
+            // Label the slider and explain why I chose the scale
+            // find d3 pie chart
             const colorScale = d3.scaleSequential(d3.interpolateBlues)
-                .domain([0, d3.max(emissionsData, d => +d.Total_Ag_Emissions_In_MilsMecTon)]);
+                .domain([0, 38]);
 
             const states = topojson.feature(us, us.objects.states);
             var statesMesh = topojson.mesh(us, us.objects.states);
