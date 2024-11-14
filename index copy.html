@@ -35,7 +35,7 @@
 
     .pie-chart {
         width: 100%;
-        height: 400px;
+        padding-top: 5px;
     }
 </style>
 
@@ -54,12 +54,20 @@
     <svg id="map1" width="1300" height="600"></svg>
 
     <div id="popup" class="popup" style="border: 2px solid black; display: none;">
-        <strong style="margin-bottom: 5px; display: block">Total Agricultural Emissions:</strong>
+        <strong>Total Agricultural Emissions:</strong>
         <hr>
         <div id="popup-content"></div>
         <hr>
         <strong>Percent Of Food Exports (in millions USD):</strong>
         <svg id="pie-chart" class="pie-chart"></svg>
+
+        <!-- legend container -->
+        <div id="legend" style="margin-top: 10px;">
+            <strong>Legend:</strong>
+            <div id="legend-content"
+                style="display: grid; grid-template-columns: 20px auto auto auto; gap: 5px; align-items: center;">
+            </div>
+        </div>
     </div>
 
     <script>
@@ -200,10 +208,10 @@
                 const pieData = stateData.map(d => ({
                     product: d.Product,
                     value: d.Export_percentage,
-                    round: parseFloat(d.Export_percentage).toFixed(1)
+                    export: d.Export_mil
                 }));
 
-                const radius = 150;
+                const radius = 130;
                 const color = d3.scaleOrdinal(d3.schemeCategory10);
                 const pie = d3.pie().value(d => d.value);
                 const arc = d3.arc().innerRadius(0).outerRadius(radius);
@@ -213,7 +221,7 @@
                     .attr("width", radius * 2)
                     .attr("height", radius * 2)
                     .append("g")
-                    .attr("transform", `translate(${radius + 25}, ${radius + 10})`);
+                    .attr("transform", `translate(${radius + 45}, ${radius})`);
 
                 g.selectAll("path")
                     .data(pie(pieData))
@@ -233,6 +241,34 @@
                     .attr("dy", "0.35em")
                     .attr("font-size", "12px")
                     .text(d => top3Products.has(d.data.product) ? d.data.product : '');
+
+                const legendContent = d3.select("#legend-content");
+                legendContent.html("");
+
+                // Pop-up legend
+                // Sort data by percentage (descending)
+                const sortedData = pieData.sort((a, b) => b.value - a.value);
+
+                // Add legend items
+                sortedData.forEach(d => {
+                    // Add color box
+                    legendContent.append("div")
+                        .style("width", "15px")
+                        .style("height", "15px")
+                        .style("background-color", color(d.product));
+
+                    // Add product name
+                    legendContent.append("div")
+                        .text(d.product);
+
+                    // Add export value
+                    legendContent.append("div")
+                        .text(`$${d3.format(",.0f")(d.export)}M`);
+
+                    // Add percentage
+                    legendContent.append("div")
+                        .text(`${d3.format(".2f")(d.value)}%`);
+                });
 
             }
 
