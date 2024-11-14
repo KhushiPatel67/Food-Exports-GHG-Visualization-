@@ -23,20 +23,19 @@
     .popup {
         position: absolute;
         top: 120px;
-        right: 10px;
+        right: 75px;
         padding: 10px;
-        padding-top: 2px;
-        padding-bottom: 50px;
+        padding-top: 10px;
+        padding-bottom: 30px;
         width: 350px;
         height: 600px;
         font-size: 18px;
         text-align: center;
     }
 
-    /* Styles for the pie chart */
     .pie-chart {
         width: 100%;
-        height: 300px;
+        height: 400px;
     }
 </style>
 
@@ -48,16 +47,18 @@
 <body>
     <p class="title" style="text-align: center"> <strong> Agricultural GHG Emissions by State </strong></p>
 
-    <input type="range" min="2011" max="2022" value="2011" id="yearSlider" style="width: 80%; margin: 20px;">
-    <div id="yearDisplay" style="text-align: center; font-size: 20px;">Year: 2011</div>
+    <input type="range" min="2011" max="2022" value="2016" id="yearSlider"
+        style="width: 800px; margin-left: 75px; margin-bottom: 5px;">
+    <div id="yearDisplay" style="margin-left: 500px; font-size: 20px;">Year: 2016</div>
 
-    <svg id="map1" width="1500" height="700"></svg>
+    <svg id="map1" width="1300" height="600"></svg>
 
     <div id="popup" class="popup" style="border: 2px solid black; display: none;">
-        <strong>Total Agricultural Emissions:
-            <hr>
-        </strong>
+        <strong style="margin-bottom: 5px; display: block">Total Agricultural Emissions:</strong>
+        <hr>
         <div id="popup-content"></div>
+        <hr>
+        <strong>Percent Of Food Exports (in millions USD):</strong>
         <svg id="pie-chart" class="pie-chart"></svg>
     </div>
 
@@ -90,8 +91,6 @@
         // if this is done, and your mouse is over a state, you should assume the
         // state hover over is considered "locked" and will seemlessly change to
         // the subsequent year when they are change this way.
-
-        // same functio, run as deafault, make 
 
         let svg = d3.select("#map1");
         const width = svg.attr("width");
@@ -159,6 +158,7 @@
                     });
             }
 
+            // Legend
             const legendWidth = 300;
             const legendHeight = 10;
 
@@ -194,14 +194,16 @@
                 .attr("fill", "black")
                 .text("Green House Gas Emissions (MMT CO2e)");
 
+            // Pie Chart
             function drawPieChart(state, year) {
                 const stateData = exportData.filter(d => d.State === state && d.Year === year);
                 const pieData = stateData.map(d => ({
                     product: d.Product,
-                    value: d.Export_percentage
+                    value: d.Export_percentage,
+                    round: parseFloat(d.Export_percentage).toFixed(1)
                 }));
 
-                const radius = 100;
+                const radius = 150;
                 const color = d3.scaleOrdinal(d3.schemeCategory10);
                 const pie = d3.pie().value(d => d.value);
                 const arc = d3.arc().innerRadius(0).outerRadius(radius);
@@ -211,7 +213,7 @@
                     .attr("width", radius * 2)
                     .attr("height", radius * 2)
                     .append("g")
-                    .attr("transform", `translate(${radius}, ${radius})`);
+                    .attr("transform", `translate(${radius + 25}, ${radius + 10})`);
 
                 g.selectAll("path")
                     .data(pie(pieData))
@@ -219,13 +221,19 @@
                     .attr("d", arc)
                     .attr("fill", d => color(d.data.product));
 
+                // Only will display text for the top 3 exports
+                const sortedPieData = pieData.sort((a, b) => b.value - a.value);
+                const top3Products = new Set(sortedPieData.slice(0, 3).map(d => d.product));
+
                 g.selectAll("text")
                     .data(pie(pieData))
                     .join("text")
+                    .attr("text-anchor", "middle")
                     .attr("transform", d => `translate(${arc.centroid(d)})`)
                     .attr("dy", "0.35em")
-                    .attr("font-size", "10px")
-                    .text(d => d.data.product);
+                    .attr("font-size", "12px")
+                    .text(d => top3Products.has(d.data.product) ? d.data.product : '');
+
             }
 
             updateMap(2011);

@@ -38,8 +38,11 @@ cleaned_categories <- everything_else %>%
   )) %>%
   # Group by State, Year, and new Product categories to sum percentages
   group_by(State, Year, Product) %>%
-  summarize(Export_percentage = sum(Export_percentage, na.rm = TRUE),
-            .groups = 'drop')
+  summarize(
+    Export_percentage = sum(Export_percentage, na.rm = TRUE),
+    Export_mil = sum(Export_mil, na.rm = TRUE),
+    .groups = 'drop'
+  )
 
 # To check the unique categories after cleaning
 unique(cleaned_categories$Product)
