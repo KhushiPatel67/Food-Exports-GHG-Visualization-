@@ -155,6 +155,41 @@
                     });
             }
 
+                    const legendWidth = 300;
+                    const legendHeight = 10;
+
+                    const legend = svg.append("g")
+                        .attr("class", "legend")
+                        .attr("transform", `translate(${margin.left + 20}, ${height - margin.bottom - 10})`);
+
+                    const legendScale = d3.scaleLinear()
+                        .domain(colorScale.domain())
+                        .range([0, legendWidth]);
+
+                    const legendAxis = d3.axisBottom(legendScale)
+                        .ticks(6)
+                        .tickFormat(d => `${d}%`);
+
+                    legend.selectAll("rect")
+                        .data(d3.ticks(...colorScale.domain(), 100))
+                        .join("rect")
+                        .attr("x", d => legendScale(d))
+                        .attr("y", 0)
+                        .attr("width", legendWidth /50)
+                        .attr("height", legendHeight)
+                        .attr("fill", d => colorScale(d));
+
+                    legend.append("g")
+                        .attr("transform", `translate(0, ${legendHeight})`)
+                        .call(legendAxis);
+
+                    legend.append("text")
+                          .attr("x", legendWidth / 2)
+                          .attr("y", legendHeight + 35) 
+                          .attr("text-anchor", "middle")
+                          .attr("fill", "black")
+                          .text("Green House Gas Emissions");
+
             function drawPieChart(state, year) {
                 const stateData = exportData.filter(d => d.State === state && d.Year === year);
                 const pieData = stateData.map(d => ({
