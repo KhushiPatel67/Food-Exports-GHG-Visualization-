@@ -37,6 +37,16 @@
         width: 100%;
         padding-top: 5px;
     }
+
+    .state {
+        pointer-events: fill;
+        /* Allows interaction on the filled area */
+    }
+
+    .outline {
+        pointer-events: stroke;
+        /* Allows interaction on the stroke area */
+    }
 </style>
 
 <head>
@@ -45,11 +55,41 @@
 </head>
 
 <body>
-    <p class="title" style="text-align: center"> <strong> Agricultural GHG Emissions by State </strong></p>
+    <p class="title" style="text-align: center"> <strong> Agricultural Green House Gas Emissions by State </strong></p>
+
+    <div id="yearDisplay" style="margin-left: 430px; font-size: 20px;">Year: 2016</div>
 
     <input type="range" min="2011" max="2022" value="2016" id="yearSlider"
-        style="width: 800px; margin-left: 75px; margin-bottom: 5px;">
-    <div id="yearDisplay" style="margin-left: 500px; font-size: 20px;">Year: 2016</div>
+        style="width: 800px; margin-left: 75px; margin-bottom: 5px;" list="yearTickMarks">
+    <datalist id="yearTickMarks">
+        <option value="2011" label="2011"></option>
+        <option value="2012" label="2012"></option>
+        <option value="2013" label="2013"></option>
+        <option value="2014" label="2014"></option>
+        <option value="2015" label="2015"></option>
+        <option value="2016" label="2016"></option>
+        <option value="2017" label="2017"></option>
+        <option value="2018" label="2018"></option>
+        <option value="2019" label="2019"></option>
+        <option value="2020" label="2020"></option>
+        <option value="2021" label="2021"></option>
+        <option value="2022" label="2022"></option>
+    </datalist>
+
+    <div style="display: flex; justify-content: space-between; margin-left: 68px; width: 815px;">
+        <span>2011</span>
+        <span>2012</span>
+        <span>2013</span>
+        <span>2014</span>
+        <span>2015</span>
+        <span>2016</span>
+        <span>2017</span>
+        <span>2018</span>
+        <span>2019</span>
+        <span>2020</span>
+        <span>2021</span>
+        <span>2022</span>
+    </div>
 
     <svg id="map1" width="1300" height="600"></svg>
 
@@ -61,7 +101,6 @@
         <strong>Percent Of Food Exports (in millions USD):</strong>
         <svg id="pie-chart" class="pie-chart"></svg>
 
-        <!-- legend container -->
         <div id="legend" style="margin-top: 10px;">
             <strong>Legend:</strong>
             <div id="legend-content"
@@ -70,14 +109,37 @@
         </div>
     </div>
 
+    <div class="report">
+        <h2>Visualization Overview</h2>
+        <p>The above visualization is a fully interactive map of the United States, highlighting agricultural greenhouse
+            gas emissions and food export data from 2011 to 2022. Our team’s goal in designing and creating this map is
+            to explore the connections between economic activity and environmental impact, focusing on emissions from
+            agricultural activities like crop farming and livestock production. </p>
+        <p>Thanks to the multi-layer complexity of this map, there are many noteworthy patterns to point out. For
+            instance, despite noticeable fluctuations across all states, the Midwest, Texas, and California consistently
+            produce the most metric tons of CO₂ equivalent greenhouse gases (GHGs) over the 12-year time span. This
+            trend is driven by intensive agricultural practices, including livestock production and large-scale crop
+            farming, which contribute to methane and nitrous oxide emissions.
+        </p>
+        <p>In addition, these high-emission states derive significant portions of their export income from commodities
+            like grains, oilseeds, and livestock products. For example, Iowa's economy is heavily influenced by grain
+            oilseed production, while Texas benefits greatly from cattle and cotton. In contrast, lower-emission states
+            such as Vermont, Rhode Island, and other parts of the Northeast primarily export non-commodity products like
+            value-added agricultural goods, which tend to generate fewer emissions due to less industrialized farming
+            methods.
+        </p>
+
+        <p><b>Project members: Anika Tasnim (at665), Ethan Carlson (eac263), Khushi Patel (ksp67)
+            </b></p>
+    </div>
+
     <script>
         // Ordered on priority:
 
-        // 1) Visuals and functionality
-        // For the pie chart in pop-up, add legend that displays colors and the 
-        // numerical price of each export (update the data file to include that)
-        // Move the slider to below the map and add a color scale legend for the
-        // map itself (currently from 0 to >=38).
+        // 1) Fix bug where flashing occurs because boarders to not count as states
+        // Also, reduce the boarder detail. check to see if you are using a mesh, point even none do
+        // Adding a skinny littel svg, add tick marks for the slider
+        // map shaper, topjson file, simplify option
 
         // 2) New deafult state (no more blank pop-up)
         // By deafult, when no state is hovered over, it should show the 
@@ -130,7 +192,7 @@
                     const year = document.getElementById("yearSlider").value;
                     const emissionValue = getEmissionValue(d.properties.name, year);
 
-                    d3.select(this).attr("stroke", "black").attr("stroke-width", 3.5);
+                    d3.select(this).attr("stroke", "black").attr("stroke-width", 3.1); // changed from 3.5
                     d3.select("#popup").style("display", "block");
                     d3.select("#popup-content")
                         .html(`<strong>${d.properties.name}</strong><br>${emissionValue ? emissionValue.toFixed(2) + " MMT CO2e" : "No data"}`);
@@ -140,6 +202,7 @@
                 .on("mouseout", function () {
                     d3.select(this).attr("stroke-width", 1);
                     d3.select("#popup").style("display", "none");
+                    duration(200);
                 });
 
             map.append("path").datum(statesMesh)
