@@ -40,12 +40,10 @@
 
     .state {
         pointer-events: fill;
-        /* Allows interaction on the filled area */
     }
 
     .outline {
         pointer-events: stroke;
-        /* Allows interaction on the stroke area */
     }
 </style>
 
@@ -174,6 +172,7 @@
             const us = await d3.json("states.json");
             const emissionsData = await d3.csv("final_data/ag_ghg.csv", d3.autoType);
             const exportData = await d3.csv("final_data/food_exports.csv", d3.autoType);
+            // const exportTotal = await d3.csv("final_data/total_exports.csv", d3.autoType);
 
             const colorScale = d3.scaleSequential(d3.interpolateOranges)
                 .domain([0, 38]);

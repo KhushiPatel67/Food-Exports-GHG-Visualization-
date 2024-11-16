@@ -69,13 +69,13 @@ write.csv(cleaned_categories, "../final_data/food_exports_by_state_year_foodcat_
 total_percentage_per_year <- cleaned_categories %>%
   group_by(Year, Product) %>%
   summarize(
-    total_export_percentage = sum(Export_percentage, na.rm = TRUE),
+    Export_percentage = sum(Export_percentage, na.rm = TRUE),
     .groups = 'drop'
   ) %>%
   # Calculate the percentage of each product over the total export percentage for that year
   group_by(Year) %>%
   mutate(
-    product_percentage_of_total = total_export_percentage / sum(total_export_percentage) * 100
+    Export_mil = Export_percentage / sum(Export_percentage) * 100
   ) %>%
   ungroup()
 
