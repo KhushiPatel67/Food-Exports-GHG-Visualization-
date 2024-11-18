@@ -110,7 +110,7 @@
     <div id="totals-popup" class="popup" style="border: 2px solid black;">
         <strong>Total Agricultural Emissions:</strong>
         <div id="totals-popup-content">
-            <hr><b>Total:</b> <br> 610.12 MMT CO2e
+            <hr><b>Global</b> <br> 610.12 MMT CO2e
             <hr>
         </div>
     </div>
@@ -228,7 +228,7 @@
                 // Update the totals pop-up content
                 const totalEmissions = calculateTotalEmissions(year);
                 d3.select("#totals-popup-content")
-                    .html(`<hr><b>Total</b> <br> ${totalEmissions.toFixed(2)} MMT CO2e<hr>`);
+                    .html(`<hr><b>Global</b> <br> ${totalEmissions.toFixed(2)} MMT CO2e<hr>`);
             });
 
             function getEmissionValue(state, year) {
