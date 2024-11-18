@@ -23,14 +23,27 @@
     .popup {
         position: absolute;
         top: 120px;
-        right: 10px;
+        right: 75px;
         padding: 10px;
-        padding-top: 2px;
-        padding-bottom: 50px;
+        padding-top: 10px;
+        padding-bottom: 30px;
         width: 350px;
-        height: 50px;
+        height: 600px;
         font-size: 18px;
         text-align: center;
+    }
+
+    .pie-chart {
+        width: 100%;
+        padding-top: 5px;
+    }
+
+    .state {
+        pointer-events: fill;
+    }
+
+    .outline {
+        pointer-events: stroke;
     }
 </style>
 
@@ -40,21 +53,121 @@
 </head>
 
 <body>
-    <p class="title" style="text-align: center"> <strong>Agricultural GHG Emissions by State</strong></p>
+    <p class="title" style="text-align: center"> <strong> Agricultural Green House Gas Emissions by State </strong></p>
 
-    <input type="range" min="2011" max="2022" value="2011" id="yearSlider" style="width: 80%; margin: 20px;">
-    <div id="yearDisplay" style="text-align: center; font-size: 20px;">Year: 2011</div>
+    <div id="yearDisplay" style="margin-left: 430px; font-size: 20px;">Year: 2016</div>
 
-    <svg id="map1" width="1500" height="700"></svg>
+    <input type="range" min="2011" max="2022" value="2016" id="yearSlider"
+        style="width: 800px; margin-left: 75px; margin-bottom: 5px;" list="yearTickMarks">
+    <datalist id="yearTickMarks">
+        <option value="2011" label="2011"></option>
+        <option value="2012" label="2012"></option>
+        <option value="2013" label="2013"></option>
+        <option value="2014" label="2014"></option>
+        <option value="2015" label="2015"></option>
+        <option value="2016" label="2016"></option>
+        <option value="2017" label="2017"></option>
+        <option value="2018" label="2018"></option>
+        <option value="2019" label="2019"></option>
+        <option value="2020" label="2020"></option>
+        <option value="2021" label="2021"></option>
+        <option value="2022" label="2022"></option>
+    </datalist>
+
+    <div style="display: flex; justify-content: space-between; margin-left: 68px; width: 815px;">
+        <span>2011</span>
+        <span>2012</span>
+        <span>2013</span>
+        <span>2014</span>
+        <span>2015</span>
+        <span>2016</span>
+        <span>2017</span>
+        <span>2018</span>
+        <span>2019</span>
+        <span>2020</span>
+        <span>2021</span>
+        <span>2022</span>
+    </div>
+
+    <svg id="map1" width="1300" height="600"></svg>
 
     <div id="popup" class="popup" style="border: 2px solid black; display: none;">
-        <strong>Total Agricultural Emissions:
-            <hr>
-        </strong>
+        <strong>Total Agricultural Emissions:</strong>
+        <hr>
         <div id="popup-content"></div>
+        <hr>
+        <strong>Percent Of Food Exports (in millions USD):</strong>
+        <svg id="pie-chart" class="pie-chart"></svg>
+
+        <div id="legend" style="margin-top: 10px;">
+            <strong>Legend:</strong>
+            <div id="legend-content"
+                style="display: grid; grid-template-columns: 20px auto auto auto; gap: 5px; align-items: center;">
+            </div>
+        </div>
+    </div>
+
+    <div id="totals-popup" class="popup" style="border: 2px solid black;">
+        <strong>Total Agricultural Emissions:</strong>
+        <div id="totals-popup-content">
+            <hr><b>Total:</b> <br> 610.12 MMT CO2e
+            <hr>
+        </div>
+    </div>
+
+    <div class="report">
+        <h2>Visualization Overview</h2>
+        <p>The above visualization is a fully interactive map of the United States, highlighting agricultural greenhouse
+            gas emissions and food export data from 2011 to 2022. Our team’s goal in designing and creating this map is
+            to explore the connections between economic activity and environmental impact, focusing on emissions from
+            agricultural activities like crop farming and livestock production. </p>
+        <p>Thanks to the multi-layer complexity of this map, there are many noteworthy patterns to point out. For
+            instance, despite noticeable fluctuations across all states, the Midwest, Texas, and California consistently
+            produce the most metric tons of CO₂ equivalent greenhouse gases (GHGs) over the 12-year time span. This
+            trend is driven by intensive agricultural practices, including livestock production and large-scale crop
+            farming, which contribute to methane and nitrous oxide emissions.
+        </p>
+        <p>In addition, these high-emission states derive significant portions of their export income from commodities
+            like grains, oilseeds, and livestock products. For example, Iowa's economy is heavily influenced by grain
+            oilseed production, while Texas benefits greatly from cattle and cotton. In contrast, lower-emission states
+            such as Vermont, Rhode Island, and other parts of the Northeast primarily export non-commodity products like
+            value-added agricultural goods, which tend to generate fewer emissions due to less industrialized farming
+            methods.
+        </p>
+
+        <p><b>Project members: Anika Tasnim (at665), Ethan Carlson (eac263), Khushi Patel (ksp67)
+            </b></p>
     </div>
 
     <script>
+        // Ordered on priority:
+
+        // 1) Fix bug where flashing occurs because boarders to not count as states
+        // Also, reduce the boarder detail. check to see if you are using a mesh, point even none do
+        // Adding a skinny littel svg, add tick marks for the slider
+        // map shaper, topjson file, simplify option
+
+        // 2) New deafult state (no more blank pop-up)
+        // By deafult, when no state is hovered over, it should show the 
+        // summation of the emissions from all states and a pie chart of all 
+        // total exports and their percentages. Should make another dataset for that.
+        // Be sure that this pop-up does not bug out when moving between years.
+
+        // 3) (only if we have time) New feature
+        // When you click on a state, it "locks" the pop-up in to the state you 
+        // clicked on (signified by a red outline instead of black).
+        // Clicking the state again will "unlock" it and resume deafult behavior 
+        // With this you can freely use the slider and watch the statitics in 
+        // the box change.
+        // This also means no other state will trigger a new box to be made while
+        // as state is "locked".
+
+        // Do not do this arrow key idea, this is just a feature I came up with.
+        // Add a feature where pressing the arrow keys moves the slider by a year
+        // if this is done, and your mouse is over a state, you should assume the
+        // state hover over is considered "locked" and will seemlessly change to
+        // the subsequent year when they are change this way.
+
         let svg = d3.select("#map1");
         const width = svg.attr("width");
         const height = svg.attr("height");
@@ -66,49 +179,41 @@
         const requestData = async function () {
             const us = await d3.json("states.json");
             const emissionsData = await d3.csv("final_data/ag_ghg.csv", d3.autoType);
+            const exportData = await d3.csv("final_data/food_exports.csv", d3.autoType);
+            // const exportTotal = await d3.csv("final_data/total_exports.csv", d3.autoType);
 
-            console.log("Loaded States Data:", us);
-            console.log("Loaded Emissions Data:", emissionsData);
-
-            const colorScale = d3.scaleSequential(d3.interpolateOranges).domain([0, 38]);
+            const colorScale = d3.scaleSequential(d3.interpolateOranges)
+                .domain([0, 38]);
 
             const states = topojson.feature(us, us.objects.states);
-            var statesMesh = topojson.mesh(us, us.objects.states);
+            const statesMesh = topojson.mesh(us, us.objects.states);
             const projection = d3.geoAlbersUsa().fitSize([mapWidth, mapHeight], states);
             const path = d3.geoPath().projection(projection);
-
-            // Background rectangle for "no-hover" state
-            map.append("rect")
-                .attr("width", mapWidth)
-                .attr("height", mapHeight)
-                .attr("x", margin.left)
-                .attr("y", margin.top)
-                .style("fill", "transparent")
-                .on("mouseover", function () {
-                    const year = document.getElementById("yearSlider").value;
-                    const totalEmissions = calculateTotalEmissions(year);
-                    d3.select("#popup").style("display", "block");
-                    d3.select("#popup-content").html(`Total: ${totalEmissions.toFixed(2)} MMT CO2e`);
-                });
 
             const statePaths = map.selectAll("path.state").data(states.features)
                 .join("path")
                 .attr("class", "state")
                 .attr("d", path)
-                .style("fill", d => colorScale(getEmissionValue(d.properties.name, 2011))) // Initial color based on 2011
+                .style("fill", d => colorScale(getEmissionValue(d.properties.name, 2011)))  // Initial color based on 2011
                 .on("mouseover", function (event, d) {
                     const year = document.getElementById("yearSlider").value;
                     const emissionValue = getEmissionValue(d.properties.name, year);
-                    console.log("Hovered on:", d.properties.name, "Emissions:", emissionValue);
 
-                    d3.select(this).attr("stroke", "black").attr("stroke-width", 3.5);
+                    d3.select(this).attr("stroke", "black").attr("stroke-width", 3.1);
                     d3.select("#popup").style("display", "block");
                     d3.select("#popup-content")
                         .html(`<strong>${d.properties.name}</strong><br>${emissionValue ? emissionValue.toFixed(2) + " MMT CO2e" : "No data"}`);
+                    drawPieChart(d.properties.name, +year);
+
+                    // Hide totals pop-up
+                    d3.select("#totals-popup").style("display", "none");
                 })
                 .on("mouseout", function () {
                     d3.select(this).attr("stroke-width", 1);
                     d3.select("#popup").style("display", "none");
+
+                    // Show totals pop-up
+                    d3.select("#totals-popup").style("display", "block");
                 });
 
             map.append("path").datum(statesMesh)
@@ -119,7 +224,18 @@
                 const year = this.value;
                 document.getElementById("yearDisplay").textContent = `Year: ${year}`;
                 updateMap(year);
+
+                // Update the totals pop-up content
+                const totalEmissions = calculateTotalEmissions(year);
+                d3.select("#totals-popup-content")
+                    .html(`<hr><b>Total</b> <br> ${totalEmissions.toFixed(2)} MMT CO2e<hr>`);
             });
+
+            function getEmissionValue(state, year) {
+                const stateData = emissionsData.find(d => d.State === state && d.Year === +year);
+                return stateData ? +stateData.Total_Ag_Emissions_In_MilsMecTon : 0;
+            }
+
 
             function getEmissionValue(state, year) {
                 const stateData = emissionsData.find(d => d.State === state && d.Year === +year);
@@ -133,14 +249,118 @@
             }
 
             function updateMap(year) {
-                console.log("Updating map for year:", year);
-
                 statePaths.transition()
-                    .duration(200)
+                    .duration(100)
                     .style("fill", d => {
                         const emissionValue = getEmissionValue(d.properties.name, year);
-                        return emissionValue ? colorScale(emissionValue) : "#ccc"; // Default grey if no data
+                        return emissionValue ? colorScale(emissionValue) : "#ccc";
                     });
+            }
+
+            // Legend
+            const legendWidth = 300;
+            const legendHeight = 10;
+
+            const legend = svg.append("g")
+                .attr("class", "legend")
+                .attr("transform", `translate(${margin.left + 20}, ${height - margin.bottom - 10})`);
+
+            const legendScale = d3.scaleLinear()
+                .domain(colorScale.domain())
+                .range([0, legendWidth]);
+
+            const legendAxis = d3.axisBottom(legendScale)
+                .tickValues([0, 5, 10, 15, 20, 25, 30, 35, 38])
+                .tickFormat(d => d >= 38 ? "38≤" : `${d}`);
+
+            legend.selectAll("rect")
+                .data(d3.ticks(...colorScale.domain(), 100))
+                .join("rect")
+                .attr("x", d => legendScale(d))
+                .attr("y", 0)
+                .attr("width", (legendWidth / 50))
+                .attr("height", legendHeight)
+                .attr("fill", d => colorScale(d));
+
+            legend.append("g")
+                .attr("transform", `translate(1, ${legendHeight})`)
+                .call(legendAxis);
+
+            legend.append("text")
+                .attr("x", legendWidth / 2)
+                .attr("y", legendHeight + 35)
+                .attr("text-anchor", "middle")
+                .attr("fill", "black")
+                .text("Green House Gas Emissions (MMT CO2e)");
+
+            // Pie Chart
+            function drawPieChart(state, year) {
+                const stateData = exportData.filter(d => d.State === state && d.Year === year);
+                const pieData = stateData.map(d => ({
+                    product: d.Product,
+                    value: d.Export_percentage,
+                    export: d.Export_mil
+                }));
+
+                const radius = 130;
+                const color = d3.scaleOrdinal(d3.schemeCategory10);
+                const pie = d3.pie().value(d => d.value);
+                const arc = d3.arc().innerRadius(0).outerRadius(radius);
+
+                d3.select("#pie-chart").selectAll("*").remove();  // Clear previous pie chart
+                const g = d3.select("#pie-chart")
+                    .attr("width", radius * 2)
+                    .attr("height", radius * 2)
+                    .append("g")
+                    .attr("transform", `translate(${radius + 45}, ${radius})`);
+
+                g.selectAll("path")
+                    .data(pie(pieData))
+                    .join("path")
+                    .attr("d", arc)
+                    .attr("fill", d => color(d.data.product));
+
+                // Only will display text for the top 3 exports
+                const sortedPieData = pieData.sort((a, b) => b.value - a.value);
+                const top3Products = new Set(sortedPieData.slice(0, 3).map(d => d.product));
+
+                g.selectAll("text")
+                    .data(pie(pieData))
+                    .join("text")
+                    .attr("text-anchor", "middle")
+                    .attr("transform", d => `translate(${arc.centroid(d)})`)
+                    .attr("dy", "0.35em")
+                    .attr("font-size", "12px")
+                    .text(d => top3Products.has(d.data.product) ? d.data.product : '');
+
+                const legendContent = d3.select("#legend-content");
+                legendContent.html("");
+
+                // Pop-up legend
+                // Sort data by percentage (descending)
+                const sortedData = pieData.sort((a, b) => b.value - a.value);
+
+                // Add legend items
+                sortedData.forEach(d => {
+                    // Add color box
+                    legendContent.append("div")
+                        .style("width", "15px")
+                        .style("height", "15px")
+                        .style("background-color", color(d.product));
+
+                    // Add product name
+                    legendContent.append("div")
+                        .text(d.product);
+
+                    // Add export value
+                    legendContent.append("div")
+                        .text(`$${d3.format(",.0f")(d.export)}M`);
+
+                    // Add percentage
+                    legendContent.append("div")
+                        .text(`${d3.format(".2f")(d.value)}%`);
+                });
+
             }
 
             updateMap(2011);
