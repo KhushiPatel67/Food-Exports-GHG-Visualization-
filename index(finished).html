@@ -152,8 +152,31 @@
     <script>
         // Ordered on priority:
 
-        // 1) Clean up code (across whole folder too) and update writting and 
-        // report by the end of today
+        // 1) Fix bug where flashing occurs because boarders to not count as states
+        // Also, reduce the boarder detail. check to see if you are using a mesh, point even none do
+        // Adding a skinny littel svg, add tick marks for the slider
+        // map shaper, topjson file, simplify option
+
+        // 2) New deafult state (no more blank pop-up)
+        // By deafult, when no state is hovered over, it should show the 
+        // summation of the emissions from all states and a pie chart of all 
+        // total exports and their percentages. Should make another dataset for that.
+        // Be sure that this pop-up does not bug out when moving between years.
+
+        // 3) (only if we have time) New feature
+        // When you click on a state, it "locks" the pop-up in to the state you 
+        // clicked on (signified by a red outline instead of black).
+        // Clicking the state again will "unlock" it and resume deafult behavior 
+        // With this you can freely use the slider and watch the statitics in 
+        // the box change.
+        // This also means no other state will trigger a new box to be made while
+        // as state is "locked".
+
+        // Do not do this arrow key idea, this is just a feature I came up with.
+        // Add a feature where pressing the arrow keys moves the slider by a year
+        // if this is done, and your mouse is over a state, you should assume the
+        // state hover over is considered "locked" and will seemlessly change to
+        // the subsequent year when they are change this way.
 
         let svg = d3.select("#map1");
         const width = svg.attr("width");
@@ -200,13 +223,15 @@
 
                 const pieData = pie(yearData);
                 const svgContainer = d3.select("#total-pie-chart");
+
+                // Clearing any previous chart
                 svgContainer.selectAll("*").remove();
 
                 const radius = 130;
                 const arc = d3.arc().innerRadius(0).outerRadius(radius);
                 const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-                // Group containing the pie chart elements
+                // Group for containing pie chart elements
                 const g = svgContainer.append("g")
                     .attr("transform", `translate(${radius}, ${radius})`);
 
@@ -216,11 +241,11 @@
                     .attr("d", arc)
                     .attr("fill", d => color(d.data.Product));
 
-                // Sort by Export_percentage
-                const sortedPieData = pieData.sort((a, b) => b.data.Export_percentage - a.data.Export_percentage);
-
-                // Labeling top 3
+                // Sort a copy of pieData
+                const sortedPieData = [...pieData].sort((a, b) => b.data.Export_percentage - a.data.Export_percentage);
                 const top3Products = new Set(sortedPieData.slice(0, 3).map(d => d.data.Product));
+
+                // Adding top 3 products to chart
                 g.selectAll("text")
                     .data(pieData)
                     .join("text")
@@ -238,16 +263,19 @@
                 const legendContent = d3.select("#legend-content-1");
                 legendContent.html("");
 
+                // Create a color scale if not already defined (ensure `color` is a D3 scaleOrdinal or similar)
                 const color = d3.scaleOrdinal(d3.schemeCategory10);
-                // Dictionary to assign each product a color
+
+                // Create a dictionary (or map) to assign each product a color
                 const productColors = {};
                 pieData.forEach(d => {
                     productColors[d.data.Product] = color(d.data.Product);
                 });
 
-                // Sort on Export_percentage
+                // Sort pieData based on Export_percentage
                 const sortedPieData = pieData.sort((a, b) => b.data.Export_percentage - a.data.Export_percentage);
 
+                // Make a dictionary for to give each Product a color than append?
                 sortedPieData.forEach(d => {
                     legendContent.append("div")
                         .style("width", "15px")
